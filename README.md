@@ -3,7 +3,7 @@
 Live CPU and memory for the [Omarchy](https://omarchy.org) bar: two braille
 history charts and a per-process table, in a panel under the bar item.
 
-![proctop](preview.png)
+![proctop](assets/theme-blue.gif)
 
 The bar carries a braille sparkline and percentage for CPU, the same for
 memory, and the 1, 5 and 15-minute load averages. Clicking it opens the panel:
@@ -49,6 +49,8 @@ Install yeet first if you have not already:
 curl -fsSL https://yeet.cx | sh
 yeet login
 ```
+
+Or follow the [manual installation guide](https://yeet.cx/docs/install/manual-installation).
 
 Then add the plugin:
 
