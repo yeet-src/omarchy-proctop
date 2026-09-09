@@ -68,11 +68,20 @@ const SPARK_W = 10;
 const SPARK_SAMPLES = SPARK_W * 2;
 
 const sparkline = (samples, width, lo, hi, curved) => {
+  /* Right-aligned: the newest sample belongs in the last cell, so a
+   * series with less history than the chart is wide fills from the right
+   * edge leftwards rather than starting at the left and leaving the
+   * newest reading in the middle. */
+  const slots = width * 2;
+  const window = samples.length >= slots
+    ? samples.slice(-slots)
+    : Array(slots - samples.length).fill(undefined).concat(samples);
+
   let line = "";
   for (let x = 0; x < width; x++) {
     let bits = 0;
     for (let col = 0; col < 2; col++) {
-      const value = samples[x * 2 + col];
+      const value = window[x * 2 + col];
       if (value === undefined) continue;
       const ratio = Math.max(0, (value - lo) / (hi - lo));
       const fill = Math.max(1, Math.min(4, Math.round((curved ? Math.sqrt(ratio) : ratio) * 4)));
@@ -442,8 +451,15 @@ export default function Page() {
 
           <row gap={0}>
             <text size="bodySmall">{`${count()} procs · ${running()} running · ${threads()} threads · load `}</text>
-            <text size="bodySmall" heat={load() / (cores() || 1)}>{load().toFixed(2)}</text>
-            <text size="bodySmall" tone="muted">{open() ? " · live 1 Hz" : ""}</text>
+            {/* Plain foreground rather than a gradient: on a theme whose
+                accent sits near the background, any point on the ramp
+                below urgent reads as dimmed. It goes urgent only once
+                load passes the core count, which is the case worth
+                colouring. */}
+            <text size="bodySmall" tone={load() > (cores() || 1) ? "urgent" : "fg"}>
+              {load().toFixed(2)}
+            </text>
+            <text size="bodySmall">{open() ? " · live 1 Hz" : ""}</text>
           </row>
         </column>
       </panel>
