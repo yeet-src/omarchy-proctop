@@ -1,0 +1,15 @@
+{
+  "name": "omarchy-proctop",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "yeetkit-omarchy dev",
+    "build": "yeetkit-omarchy build",
+    "check": "yeetkit-omarchy build && yeetkit-omarchy check",
+    "dist": "yeetkit-omarchy build && cp -a plugin/. ."
+  },
+  "dependencies": {
+    "yeetkit-omarchy": "file:../yeetkit-omarchy"
+  },
+  "version": "0.1.0"
+}

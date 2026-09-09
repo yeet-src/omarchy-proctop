@@ -1,0 +1,2 @@
+module yeetkit
+singleton Isolate 1.0 Isolate.qml
