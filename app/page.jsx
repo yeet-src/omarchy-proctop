@@ -425,9 +425,9 @@ export default function Page() {
 
           <row gap={0}>
             <text bold>{"PROCESS".padEnd(columns(cols()).name + 1)}</text>
-            <text bold>{"CPU".padEnd(SPARK_W + 1)}</text>
+            <text bold>{"CPU".padStart(SPARK_W) + " "}</text>
             <text bold>{"NOW".padStart(NOW_FIG) + " ".repeat(NOW_W - NOW_FIG)}</text>
-            <text bold>{"RAM".padEnd(SPARK_W + 1)}</text>
+            <text bold>{"RAM".padStart(SPARK_W) + " "}</text>
             <text bold>{"RSS".padStart(RSS_W)}</text>
           </row>
 
