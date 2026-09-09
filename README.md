@@ -5,8 +5,8 @@ history charts and a per-process table, in a panel under the bar item.
 
 ![proctop](preview.png)
 
-The bar shows a small braille sparkline for CPU and one for memory, then the
-process count. Clicking it opens the panel:
+The bar carries a braille sparkline and percentage for CPU, the same for
+memory, and the 1, 5 and 15-minute load averages. Clicking it opens the panel:
 
 - **CPU**, on an absolute 0–100% axis, and **memory**, framed on its own
   min–max band — against a `0–peak` axis a flat memory series draws as a solid
@@ -17,8 +17,8 @@ process count. Clicking it opens the panel:
 
 Nothing polls. Samples arrive over `yeet.graph.subscribe` at 1 Hz, and the
 process list — the heavy one, every process with its stat each tick — drops to
-one sample every four seconds while the panel is shut, since all the bar needs
-from it is the count.
+one sample every four seconds while the panel is shut, where the only thing
+reading it is the bar item's tooltip.
 
 Every colour comes from the active Omarchy theme (`muted` → `accent` →
 `urgent`), so the panel follows whatever theme is set. On a deliberately
