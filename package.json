@@ -6,10 +6,11 @@
     "dev": "yeetkit-omarchy dev",
     "build": "yeetkit-omarchy build",
     "check": "yeetkit-omarchy build && yeetkit-omarchy check",
-    "dist": "yeetkit-omarchy build && cp -a plugin/. ."
+    "dist": "yeetkit-omarchy build && cp -a plugin/. .",
+    "vendor": "npm pack --pack-destination vendor ../yeetkit-omarchy && npm install"
   },
   "dependencies": {
-    "yeetkit-omarchy": "file:../yeetkit-omarchy"
+    "yeetkit-omarchy": "file:vendor/yeetkit-omarchy-0.1.0.tgz"
   },
   "version": "0.1.0"
 }

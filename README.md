@@ -54,9 +54,10 @@ The installable plugin is committed at the repository root — `manifest.json`,
 a clone is ready to load with no build step. The source of that output is
 `app/page.jsx`.
 
-Rebuilding needs [yeetkit-omarchy](https://github.com/yeet-src/yeetkit-omarchy)
-checked out beside this repository, since `package.json` refers to it as
-`file:../yeetkit-omarchy`:
+Rebuilding needs nothing outside this repository. The framework it is built
+with, [yeetkit-omarchy](https://github.com/yeet-src/yeetkit-omarchy), is
+committed as a packed tarball under `vendor/`, and `package.json` depends on
+that file:
 
 ```sh
 npm install
@@ -64,11 +65,13 @@ npm run dist     # build into plugin/, then sync it to the root
 npm run check    # drive the built plugin over a real portal
 ```
 
-`omarchy plugin validate .` passes on a fresh clone, which is what
-`omarchy plugin add` produces. It fails after `npm install`, because npm
-links the framework as a symlink under `node_modules/` and Omarchy allows
-no symlinks inside a plugin folder — `node_modules/` is gitignored and
-never ships, so this only affects a working tree.
+npm extracts a tarball dependency rather than symlinking it, so nothing under
+`node_modules/` is a symlink and `omarchy plugin validate .` passes in a
+working tree as well as in a fresh clone.
+
+To move to a newer framework, check it out beside this repository and run
+`npm run vendor`, which re-packs it into `vendor/` and reinstalls. Then
+`npm run dist` and commit the rebuilt root.
 
 `npm run dev` builds straight into `~/.config/omarchy/plugins/cx.yeet.proctop`
 and rebuilds on change. Note that the shell reloads `app.js` on its own, but
