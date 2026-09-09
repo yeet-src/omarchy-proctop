@@ -39,18 +39,54 @@ Panel {
     id: section
     property string label: ""
     property string value: ""
+    property bool copyable: false
     property color valueColor: Color.popups.text
+    property bool copied: false
     spacing: Style.spacing.xxs
 
-    Text {
-      text: section.label
-      color: Color.muted
-      font.family: Style.font.family
-      font.pixelSize: Style.font.bodySmall
-      font.bold: true
+    /* TextEdit.copy() puts the selection on the clipboard, so the
+     * button selects the line, copies it and drops the selection
+     * again — no helper process, nothing to install. */
+    function copyValue() {
+      field.selectAll()
+      field.copy()
+      field.deselect()
+      section.copied = true
+      revert.restart()
+    }
+
+    Timer {
+      id: revert
+      interval: 1500
+      onTriggered: section.copied = false
+    }
+
+    Row {
+      width: section.width
+      spacing: Style.spacing.sm
+
+      Text {
+        text: section.label
+        color: Color.popups.text
+        font.family: Style.font.family
+        font.pixelSize: Style.font.bodySmall
+        font.bold: true
+      }
+
+      Button {
+        visible: section.copyable
+        text: section.copied ? "copied" : "copy"
+        foreground: Color.muted
+        fontSize: Style.font.bodySmall
+        horizontalPadding: Style.spacing.xs
+        verticalPadding: 0
+        tooltipText: "Copy to the clipboard"
+        onClicked: section.copyValue()
+      }
     }
 
     TextEdit {
+      id: field
       width: section.width
       readOnly: true
       selectByMouse: true
@@ -155,6 +191,7 @@ Panel {
             visible: help.trouble === "daemon"
             label: "Start"
             value: "sudo systemctl enable --now yeetd"
+            copyable: true
           }
 
           Section {
@@ -162,6 +199,7 @@ Panel {
             visible: help.trouble === "missing"
             label: "Install"
             value: "curl -fsSL https://yeet.cx | sh"
+            copyable: true
           }
 
           Row {
