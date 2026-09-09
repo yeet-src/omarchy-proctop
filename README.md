@@ -65,9 +65,12 @@ npm run dist     # build into plugin/, then sync it to the root
 npm run check    # drive the built plugin over a real portal
 ```
 
-npm extracts a tarball dependency rather than symlinking it, so nothing under
-`node_modules/` is a symlink and `omarchy plugin validate .` passes in a
-working tree as well as in a fresh clone.
+`omarchy plugin validate .` passes on a fresh clone, which is what
+`omarchy plugin add` produces. In a working tree it fails on
+`node_modules/.bin/yeetkit-omarchy` — npm always links a package's declared
+binary, and Omarchy allows no symlinks inside a plugin folder. `node_modules/`
+is gitignored and never ships, so this affects only a tree you have installed
+into.
 
 To move to a newer framework, check it out beside this repository and run
 `npm run vendor`, which re-packs it into `vendor/` and reinstalls. Then
