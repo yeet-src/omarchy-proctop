@@ -145,6 +145,8 @@ export default function Page() {
   const [cpu, setCpu] = createSignal(0);
   const [cpuPast, setCpuPast] = createSignal([]);
   const [load, setLoad] = createSignal(0);
+  const [load5, setLoad5] = createSignal(0);
+  const [load15, setLoad15] = createSignal(0);
   const [cores, setCores] = createSignal(0);
   const [open, setOpen] = createSignal(false);
   const [cols, setCols] = createSignal(48);
@@ -273,7 +275,11 @@ export default function Page() {
     },
   );
 
-  live(`load_average(interval_ms: ${HZ}) { one }`, (data) => setLoad(data.load_average.one));
+  live(`load_average(interval_ms: ${HZ}) { one five fifteen }`, (data) => {
+    setLoad(data.load_average.one);
+    setLoad5(data.load_average.five);
+    setLoad15(data.load_average.fifteen);
+  });
 
   /* Core count does not change, so it is asked for once. */
   yeet.graph.query(`{ cpu { num_cores } }`).then(({ data }) => setCores(data.cpu.num_cores));
@@ -358,7 +364,8 @@ export default function Page() {
         heat={lift(Math.max(cpu(), usedShare()))}
         tooltipText={`CPU ${pct(cpu())} · ${size(used())} of ${size(mem().total)} · ${count()} processes`}
       >
-        {`${barCpu()} ${barMem()} ${count()} procs`}
+        {`${barCpu()} ${pct(cpu())} ${barMem()} ${pct(usedShare())} `
+          + `${load().toFixed(2)} / ${load5().toFixed(2)} / ${load15().toFixed(2)}`}
       </bar>
 
       <panel
