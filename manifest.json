@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "cx.yeet.proctop",
-  "name": "Proctop",
+  "name": "proctop",
   "version": "0.1.0",
   "author": "yeet",
   "license": "Apache-2.0",
@@ -14,7 +14,7 @@
     "barWidget": "BarWidget.qml"
   },
   "barWidget": {
-    "displayName": "Proctop",
+    "displayName": "proctop",
     "description": "Live CPU and memory history in the Omarchy bar, with a per-process table. Braille charts, sampled by subscription rather than polling.",
     "category": "System",
     "allowMultiple": false,

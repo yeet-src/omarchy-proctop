@@ -14,7 +14,7 @@ BarWidget {
 
   readonly property bool opened: panelLoader.item ? panelLoader.item.opened === true : false
   readonly property bool popoutSwitchClosing: panelLoader.item ? panelLoader.item.popoutSwitchClosing === true : false
-  readonly property bool hasPanel: !!client.regions.panel
+  readonly property bool hasPanel: !!client.regions.panel || Kit.Isolate.trouble !== ""
   property Item barItem: client.regions.bar || null
 
   function open() { if (panelLoader.item && hasPanel) panelLoader.item.open() }
@@ -64,17 +64,25 @@ BarWidget {
   }
 
   /* Until the tree arrives — the isolate is still starting, or has
-   * just restarted — a dimmed dot keeps the slot from collapsing. */
+   * just restarted — a dimmed dot keeps the slot from collapsing. When
+   * the reason it will never arrive is yeet itself, the dot gives way to
+   * a label that says so and opens the panel, which carries the remedy. */
   WidgetButton {
     id: placeholder
     anchors.fill: parent
     bar: root.bar
     visible: !root.barItem
-    dimmed: true
+    dimmed: Kit.Isolate.trouble === ""
     keepSpace: true
-    text: client.phase === "reconnecting" ? "…" : "·"
-    tooltipText: "Proctop — waiting for the isolate"
-    pressable: false
+    text: Kit.Isolate.trouble !== "" ? "⚠ yeet"
+        : client.phase === "reconnecting" ? "…" : "·"
+    tooltipText: Kit.Isolate.trouble === "missing"
+        ? "proctop — yeet is not installed; click for instructions"
+        : Kit.Isolate.trouble === "daemon"
+        ? "proctop — yeetd is not running; click for instructions"
+        : "proctop — waiting for the isolate"
+    pressable: Kit.Isolate.trouble !== ""
+    onPressed: root.toggle()
   }
 
   Loader {

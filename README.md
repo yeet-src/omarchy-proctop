@@ -1,9 +1,9 @@
-# Proctop
+# proctop
 
 Live CPU and memory for the [Omarchy](https://omarchy.org) bar: two braille
 history charts and a per-process table, in a panel under the bar item.
 
-![Proctop](preview.png)
+![proctop](preview.png)
 
 The bar shows a small braille sparkline for CPU and one for memory, then the
 process count. Clicking it opens the panel:

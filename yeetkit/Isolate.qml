@@ -19,6 +19,11 @@ import "Config.js" as Config
  * sequence escaped to ASCII, messages up as base64url ending in Enter.
  * No port, no socket, nothing another user on the machine can dial.
  *
+ * The run needs `yeet` on PATH and its daemon up. When either is
+ * absent the process can never come up, so rather than respawn forever
+ * behind a placeholder, a probe names which one is wrong and the entry
+ * files show the remedy.
+ *
  * Clients attach and detach; the run starts with the first and stops a
  * few seconds after the last, so disabling the plugin stops the
  * isolate too. A rewritten app.js — the dev loop's rebuild — restarts
@@ -34,8 +39,16 @@ QtObject {
   /** A chunk of the isolate's output, frames and all. */
   signal chunk(string data)
 
+  /* Why the isolate cannot come up, when it cannot: "missing" if `yeet`
+   * is not on PATH, "daemon" if yeetd is not running, "" when there is
+   * nothing we can name. */
+  property string trouble: ""
+
+  function diagnose() { if (!probe.running) probe.running = true }
+
   function attach() {
     clients += 1
+    diagnose()
     stopTimer.stop()
     if (!process.running) process.running = true
   }
@@ -71,7 +84,25 @@ QtObject {
     }
     /* The daemon tears the portal down a moment after a run exits, so
      * an immediate respawn is met with "already mounted". */
-    onExited: function (code, status) { if (root.clients > 0) root.respawn.restart() }
+    onExited: function (code, status) {
+      if (root.clients > 0) {
+        root.diagnose()
+        root.respawn.restart()
+      }
+    }
+  }
+
+  property Process probe: Process {
+    command: ["sh", "-c",
+      "command -v yeet >/dev/null 2>&1 || { echo missing; exit 0; }; " +
+      "systemctl is-active --quiet yeetd 2>/dev/null || { echo daemon; exit 0; }; " +
+      "echo ok"]
+    stdout: SplitParser {
+      onRead: function (line) {
+        var word = line.trim()
+        if (word !== "") root.trouble = word === "ok" ? "" : word
+      }
+    }
   }
 
   property Timer respawn: Timer {
