@@ -24,6 +24,12 @@ Every colour comes from the active Omarchy theme (`muted` → `accent` →
 `urgent`), so the panel follows whatever theme is set. On a deliberately
 monochrome theme there is no hue to follow and the charts render in greys.
 
+<p align="center">
+  <img src="assets/theme-blue.gif" width="32%" alt="proctop on a blue theme">
+  <img src="assets/theme-orange.gif" width="32%" alt="proctop on an orange theme">
+  <img src="assets/theme-mono.gif" width="32%" alt="proctop on a monochrome theme">
+</p>
+
 ## Requirements
 
 - [yeet](https://yeet.cx) — `yeet` on `PATH` with `yeetd` running, and
@@ -36,6 +42,15 @@ opened, and the isolate stops a few seconds after the last bar widget goes
 away.
 
 ## Install
+
+Install yeet first if you have not already:
+
+```sh
+curl -fsSL https://yeet.cx | sh
+yeet login
+```
+
+Then add the plugin:
 
 ```sh
 omarchy plugin add https://github.com/yeet-src/omarchy-proctop --enable
