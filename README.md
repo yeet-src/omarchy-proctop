@@ -43,20 +43,32 @@ away.
 
 ## Install
 
-Install yeet first if you have not already:
-
-```sh
-curl -fsSL https://yeet.cx | sh
-yeet login
-```
-
-Or follow the [manual installation guide](https://yeet.cx/docs/install/manual-installation).
-
-Then add the plugin:
-
 ```sh
 omarchy plugin add https://github.com/yeet-src/omarchy-proctop --enable
 ```
+
+The bar item then asks for yeet until it is installed and logged in. The
+pinned installer that ships in the plugin checkout fetches a fixed yeet
+release for your architecture, verifies the package's sha256 and signature
+against the values written in the script, installs it, starts the daemon and
+logs in:
+
+```sh
+sh ~/.config/omarchy/plugins/cx.yeet.proctop/install-yeet.sh
+```
+
+Or, to track new releases along with the rest of the system, take it from the
+AUR, where [`yeet-bin`](https://aur.archlinux.org/packages/yeet-bin) pins a
+release and checks its sha256 and GPG signature before installing:
+
+```sh
+yay -S yeet-bin
+sudo systemctl enable --now yeetd
+yeet login
+```
+
+Other package managers are covered in the
+[manual installation guide](https://yeet.cx/docs/install/manual-installation).
 
 ## Remove
 
