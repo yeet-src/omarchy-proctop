@@ -43,8 +43,8 @@ away.
 
 ## Install
 
-Add the plugin first. Until yeet is installed and logged in, the bar item
-shows what is missing and how to fix it:
+Add the plugin first. Until yeet is installed and its daemon running, the bar
+item shows what is missing and how to fix it:
 
 ```sh
 omarchy plugin add https://github.com/yeet-src/omarchy-proctop --enable
