@@ -22,7 +22,7 @@ main() {
   case $arch in
     x86_64)  sum=$sha256_x86_64 ;;
     aarch64) sum=$sha256_aarch64 ;;
-    *) echo "install-yeet: no yeet package for $arch" >&2; exit 1 ;;
+    *) >&2 echo "install-yeet: no yeet package for $arch"; exit 1 ;;
   esac
 
   pkg="yeet-$version-$arch.pkg.tar.zst"
@@ -32,7 +32,7 @@ main() {
   trap 'cd / && rm -rf "$dir"' EXIT
   cd "$dir"
 
-  echo "Fetching yeet $version for $arch"
+  >&2 echo "Fetching yeet $version for $arch"
   curl -fsSLO "$base/$pkg"
   curl -fsSLO "$base/$pkg.sig"
   curl -fsSLo yeet.pub https://pkgs.yeet.cx/archlinux/yeet.noarmor.gpg
@@ -43,6 +43,19 @@ main() {
   sudo pacman-key --lsign-key "$key"
   sudo pacman -U --noconfirm "$pkg"
   sudo systemctl enable --now yeetd
+
+  # systemctl returns once yeetd is forked and its socket appears a moment
+  # later. Wait for it, so a yeet login pasted after this script cannot
+  # land in that gap and fail with "Daemon Unavailable".
+  n=0
+  until yeet status >/dev/null 2>&1; do
+    n=$((n + 1))
+    if [ "$n" -ge 50 ]; then
+      >&2 echo "install-yeet: yeetd did not come up; see: journalctl -u yeetd"
+      exit 1
+    fi
+    sleep 0.2
+  done
 }
 
 main "$@"
