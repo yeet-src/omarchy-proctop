@@ -50,13 +50,14 @@ shows what is missing and how to fix it:
 omarchy plugin add https://github.com/yeet-src/omarchy-proctop --enable
 ```
 
-Then run the pinned installer from the plugin checkout. It fetches a fixed
-yeet release for your architecture, checks the package's sha256 and signature
-against values written in the script, installs it, starts the daemon and logs
-in:
+Then run the pinned installer from the plugin checkout and log in. The
+installer fetches a fixed yeet release for your architecture, checks the
+package's sha256 and signature against values written in the script, installs
+it and starts the daemon:
 
 ```sh
 sh ~/.config/omarchy/plugins/cx.yeet.proctop/install-yeet.sh
+yeet login
 ```
 
 To track new yeet releases along with the rest of the system, use the AUR

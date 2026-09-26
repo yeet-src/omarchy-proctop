@@ -3,8 +3,9 @@
 #
 # Fetches yeet 0.23.0 for this machine's architecture from pkgs.yeet.cx,
 # checks the package's sha256 against the values below and its signature
-# against the pinned release key, installs it with pacman, starts the
-# daemon and logs in. Every step must succeed for the next to run.
+# against the pinned release key, installs it with pacman and starts the
+# daemon. Every step must succeed for the next to run. Log in afterwards
+# with `yeet login`.
 #
 # Run it from the plugin checkout, which is this repository:
 #   sh ~/.config/omarchy/plugins/cx.yeet.proctop/install-yeet.sh
@@ -42,8 +43,6 @@ main() {
   sudo pacman-key --lsign-key "$key"
   sudo pacman -U --noconfirm "$pkg"
   sudo systemctl enable --now yeetd
-
-  yeet login
 }
 
 main "$@"
