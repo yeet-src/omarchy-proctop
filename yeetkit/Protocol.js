@@ -73,11 +73,26 @@ function bytesToString(buffer) {
   return out;
 }
 
+/* The most a single frame may run to. Patches are UI-tree deltas —
+ * a few hundred bytes to a few hundred KiB for a full mount — so a
+ * body past this is not a patch but a fault or a hostile app, and the
+ * framer must not keep buffering it: the isolate's stdout is
+ * unbounded and the shell's memory is not. */
+var MAX_FRAME = 8 * 1024 * 1024;
+
 /* Frames can be split across messages and several can share one; the
  * framer keeps the tail and hands out whole patches. Returns a
- * function to feed text into. */
+ * function to feed text into.
+ *
+ * A frame whose body outgrows MAX_FRAME is dropped before it is parsed:
+ * its opener is discarded and scanning resumes at the next one, so the
+ * rest of the oversized body streams past as noise and `pending` never
+ * holds more than MAX_FRAME plus one chunk. */
 function framer(onPatch, onError) {
   var pending = "";
+  function reject(reason, preview) {
+    if (onError) onError(reason instanceof Error ? reason : new Error(reason), preview);
+  }
   return function (chunk) {
     pending += chunk;
     for (;;) {
@@ -86,18 +101,28 @@ function framer(onPatch, onError) {
         pending = pending.slice(-OSC_OPEN.length);
         return;
       }
-      var end = pending.indexOf(OSC_CLOSE, start);
+      var bodyStart = start + OSC_OPEN.length;
+      var end = pending.indexOf(OSC_CLOSE, bodyStart);
       if (end < 0) {
+        if (pending.length - bodyStart > MAX_FRAME) {
+          reject("frame exceeds " + MAX_FRAME + " bytes", pending.substr(bodyStart, 200));
+          pending = pending.slice(bodyStart);
+          continue;
+        }
         pending = pending.slice(start);
         return;
       }
-      var body = pending.slice(start + OSC_OPEN.length, end);
+      var body = pending.slice(bodyStart, end);
       pending = pending.slice(end + OSC_CLOSE.length);
+      if (body.length > MAX_FRAME) {
+        reject("frame exceeds " + MAX_FRAME + " bytes", body.slice(0, 200));
+        continue;
+      }
       var patch = null;
       try {
         patch = JSON.parse(body);
       } catch (error) {
-        if (onError) onError(error, body.slice(0, 200));
+        reject(error, body.slice(0, 200));
         continue;
       }
       onPatch(patch);

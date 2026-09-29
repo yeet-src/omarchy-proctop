@@ -17,6 +17,22 @@ key=F537B2E78670F4F6C75D0E997FE0E3E7218228E6
 sha256_x86_64=3c771d827de504b25418ebf863482a1fd5ac27a8f20e3f599c8e6c61efe05ea3
 sha256_aarch64=cd5ed0c40ee01d1b33f6e26845935c7913ff92dccb0dad341def84ccd6e53768
 
+# fetch URL FILE MAX_SIZE MAX_SECONDS
+#
+# Every download is bounded before the checksum ever runs: the server
+# has 15s to answer, the whole transfer has MAX_SECONDS, a link that
+# drops under 10 KiB/s for 30s counts as stalled, and a response past
+# MAX_SIZE is refused (from Content-Length up front, or, with curl 8.4
+# or newer, the moment the body crosses it) instead of filling the
+# disk. The package is about 56 MiB; the signature and key are bytes.
+fetch() {
+  curl -fsSL \
+    --connect-timeout 15 --max-time "$4" \
+    --speed-limit 10240 --speed-time 30 \
+    --max-filesize "$3" \
+    -o "$2" "$1"
+}
+
 main() {
   arch=$(uname -m)
   case $arch in
@@ -33,9 +49,9 @@ main() {
   cd "$dir"
 
   >&2 echo "Fetching yeet $version for $arch"
-  curl -fsSLO "$base/$pkg"
-  curl -fsSLO "$base/$pkg.sig"
-  curl -fsSLo yeet.pub https://pkgs.yeet.cx/archlinux/yeet.noarmor.gpg
+  fetch "$base/$pkg" "$pkg" 128M 900
+  fetch "$base/$pkg.sig" "$pkg.sig" 16K 60
+  fetch https://pkgs.yeet.cx/archlinux/yeet.noarmor.gpg yeet.pub 64K 60
 
   echo "$sum  $pkg" | sha256sum -c
 
